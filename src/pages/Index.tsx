@@ -29,7 +29,7 @@ const Index = () => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     
     // Load saved API key
-    const savedKey = localStorage.getItem('openai_api_key');
+    const savedKey = localStorage.getItem('claude_api_key');
     if (savedKey) setApiKey(savedKey);
     
     // Load saved file system
@@ -48,7 +48,7 @@ const Index = () => {
   useEffect(() => {
     // Save API key
     if (apiKey) {
-      localStorage.setItem('openai_api_key', apiKey);
+      localStorage.setItem('claude_api_key', apiKey);
     }
   }, [apiKey]);
 
@@ -60,7 +60,7 @@ const Index = () => {
     if (!apiKey) {
       toast({
         title: 'API Key Required',
-        description: 'Please enter your OpenAI API key to continue.',
+        description: 'Please enter your Claude API key to continue.',
         variant: 'destructive',
       });
       return;

@@ -5,13 +5,10 @@ export interface AIMessage {
 
 export async function generateProject(prompt: string, apiKey: string): Promise<string> {
   if (!apiKey) {
-    throw new Error('OpenAI API key is required');
+    throw new Error('Claude API key is required');
   }
 
-  const messages: AIMessage[] = [
-    {
-      role: 'system',
-      content: `You are an expert web developer. Generate complete, working project code based on user requests. 
+  const systemPrompt = `You are an expert web developer. Generate complete, working project code based on user requests. 
       
 Your response should be a JSON object with this structure:
 {
@@ -29,26 +26,26 @@ Your response should be a JSON object with this structure:
 }
 
 Generate complete, production-ready code. Include proper HTML, CSS, and JavaScript/TypeScript.
-Make the UI beautiful and fully functional.`
-    },
-    {
-      role: 'user',
-      content: prompt
-    }
-  ];
+Make the UI beautiful and fully functional.`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages,
-        temperature: 0.7,
-        max_tokens: 4000
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
       })
     });
 
@@ -58,7 +55,7 @@ Make the UI beautiful and fully functional.`
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.content[0].text;
   } catch (error) {
     console.error('AI generation error:', error);
     throw error;
@@ -67,21 +64,31 @@ Make the UI beautiful and fully functional.`
 
 export async function chatWithAI(messages: AIMessage[], apiKey: string): Promise<string> {
   if (!apiKey) {
-    throw new Error('OpenAI API key is required');
+    throw new Error('Claude API key is required');
   }
 
+  // Separate system messages from user/assistant messages
+  const systemMessage = messages.find(m => m.role === 'system')?.content || '';
+  const conversationMessages = messages
+    .filter(m => m.role !== 'system')
+    .map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages,
-        temperature: 0.7,
-        max_tokens: 2000
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2048,
+        system: systemMessage,
+        messages: conversationMessages
       })
     });
 
@@ -91,7 +98,7 @@ export async function chatWithAI(messages: AIMessage[], apiKey: string): Promise
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.content[0].text;
   } catch (error) {
     console.error('AI chat error:', error);
     throw error;

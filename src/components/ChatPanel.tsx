@@ -43,7 +43,7 @@ export function ChatPanel({ onSendMessage, messages, isLoading, apiKey, onApiKey
       <div className="p-4 border-b border-border flex-shrink-0 space-y-2">
         <Label htmlFor="api-key" className="text-xs flex items-center gap-2">
           <Key className="w-3 h-3" />
-          OpenAI API Key
+          Claude API Key
         </Label>
         <Input
           id="api-key"
