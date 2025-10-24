@@ -21,16 +21,11 @@ const Index = () => {
   const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [apiKey, setApiKey] = useState('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');
   const { toast } = useToast();
 
   useEffect(() => {
     // Apply theme
     document.documentElement.classList.toggle('dark', theme === 'dark');
-    
-    // Load saved API key
-    const savedKey = localStorage.getItem('claude_api_key');
-    if (savedKey) setApiKey(savedKey);
     
     // Load saved file system
     const savedFS = localStorage.getItem('fileSystem');
@@ -45,34 +40,19 @@ const Index = () => {
     addConsoleMessage('info', 'AI Coding Studio initialized');
   }, []);
 
-  useEffect(() => {
-    // Save API key
-    if (apiKey) {
-      localStorage.setItem('claude_api_key', apiKey);
-    }
-  }, [apiKey]);
 
   const addConsoleMessage = (type: ConsoleMessage['type'], message: string) => {
     setConsoleMessages(prev => [...prev, { type, message, timestamp: new Date() }]);
   };
 
   const handleSendMessage = async (message: string) => {
-    if (!apiKey) {
-      toast({
-        title: 'API Key Required',
-        description: 'Please enter your Claude API key to continue.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     const userMessage: Message = { role: 'user', content: message };
     setMessages(prev => [...prev, userMessage]);
     setIsGenerating(true);
     addConsoleMessage('info', `User: ${message}`);
 
     try {
-      const response = await generateProject(message, apiKey);
+      const response = await generateProject(message);
       addConsoleMessage('success', 'AI response received');
       
       // Try to parse the JSON response
@@ -181,8 +161,6 @@ const Index = () => {
             onSendMessage={handleSendMessage}
             messages={messages}
             isLoading={isGenerating}
-            apiKey={apiKey}
-            onApiKeyChange={setApiKey}
           />
         </div>
         

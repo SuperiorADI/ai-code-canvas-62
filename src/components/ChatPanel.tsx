@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Send, Loader2, Bot, User, Key } from 'lucide-react';
+import { Send, Loader2, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Message {
@@ -15,16 +13,14 @@ interface ChatPanelProps {
   onSendMessage: (message: string) => void;
   messages: Message[];
   isLoading: boolean;
-  apiKey: string;
-  onApiKeyChange: (key: string) => void;
 }
 
-export function ChatPanel({ onSendMessage, messages, isLoading, apiKey, onApiKeyChange }: ChatPanelProps) {
+export function ChatPanel({ onSendMessage, messages, isLoading }: ChatPanelProps) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && !isLoading && apiKey) {
+    if (input.trim() && !isLoading) {
       onSendMessage(input.trim());
       setInput('');
     }
@@ -38,24 +34,6 @@ export function ChatPanel({ onSendMessage, messages, isLoading, apiKey, onApiKey
           AI Assistant
         </h2>
         <p className="text-sm text-muted-foreground mt-1">Describe your project idea</p>
-      </div>
-
-      <div className="p-4 border-b border-border flex-shrink-0 space-y-2">
-        <Label htmlFor="api-key" className="text-xs flex items-center gap-2">
-          <Key className="w-3 h-3" />
-          Claude API Key
-        </Label>
-        <Input
-          id="api-key"
-          type="password"
-          value={apiKey}
-          onChange={(e) => onApiKeyChange(e.target.value)}
-          placeholder="sk-..."
-          className="text-xs font-mono"
-        />
-        <p className="text-xs text-muted-foreground">
-          ⚠️ For production, use secure backend storage
-        </p>
       </div>
 
       <ScrollArea className="flex-1 p-4">
@@ -116,12 +94,12 @@ export function ChatPanel({ onSendMessage, messages, isLoading, apiKey, onApiKey
             placeholder="Describe your project idea…"
             className="resize-none"
             rows={3}
-            disabled={isLoading || !apiKey}
+            disabled={isLoading}
           />
           <Button
             type="submit"
             size="icon"
-            disabled={isLoading || !input.trim() || !apiKey}
+            disabled={isLoading || !input.trim()}
             className="flex-shrink-0"
           >
             <Send className="w-4 h-4" />
