@@ -21,7 +21,7 @@ const Index = () => {
   const [consoleMessages, setConsoleMessages] = useState<ConsoleMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useState('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');
   const { toast } = useToast();
 
   useEffect(() => {
